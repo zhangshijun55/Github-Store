@@ -7,7 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import zed.rainxch.githubstore.feature.auth.data.AccessTokenProvider
+import zed.rainxch.githubstore.core.data.TokenDataSource
 
 /**
  * Build a Ktor client preconfigured for GitHub REST API.
@@ -31,7 +31,8 @@ fun buildGitHubHttpClient(getAccessToken: () -> String?): HttpClient {
 }
 
 /**
- * Convenience builder that automatically pulls the latest token from AccessTokenProvider
+ * Convenience builder that pulls the latest token from the provided TokenDataSource
  * so every request includes `Authorization: Bearer <token>` when available.
  */
-fun buildAuthedGitHubHttpClient(): HttpClient = buildGitHubHttpClient { AccessTokenProvider.current() }
+fun buildAuthedGitHubHttpClient(tokenDataSource: TokenDataSource): HttpClient =
+    buildGitHubHttpClient { tokenDataSource.current()?.accessToken }

@@ -2,11 +2,14 @@ package zed.rainxch.githubstore.core.data
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import zed.rainxch.githubstore.feature.auth.data.DeviceTokenSuccess
 import zed.rainxch.githubstore.feature.auth.data.DefaultTokenStore
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /**
  * TokenDataSource is the source of truth for auth tokens.
@@ -18,21 +21,28 @@ interface TokenDataSource {
     suspend fun save(token: DeviceTokenSuccess)
     suspend fun load(): DeviceTokenSuccess?
     suspend fun clear()
+
+    /** Synchronous snapshot of the latest token (may be null). */
+    fun current(): DeviceTokenSuccess?
 }
 
 /**
  * Default implementation that delegates to existing platform DefaultTokenStore (persisted),
  * and mirrors updates into an in-memory StateFlow sourced from persistence at startup.
  */
+
+@OptIn(ExperimentalAtomicApi::class)
 class DefaultTokenDataSource(
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : TokenDataSource {
     private val _flow = MutableStateFlow<DeviceTokenSuccess?>(null)
     override val tokenFlow: StateFlow<DeviceTokenSuccess?> = _flow
+    private val isInitialized = AtomicBoolean(false)
 
     init {
         scope.launch {
             _flow.value = DefaultTokenStore.load()
+            isInitialized.store(true)
         }
     }
 
@@ -47,4 +57,6 @@ class DefaultTokenDataSource(
         DefaultTokenStore.clear()
         _flow.value = null
     }
+
+    override fun current(): DeviceTokenSuccess? = _flow.value
 }

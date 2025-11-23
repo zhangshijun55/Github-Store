@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.OpenWith
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -50,7 +49,7 @@ import zed.rainxch.githubstore.feature.auth.data.DeviceStart
 
 @Composable
 fun AuthenticationRoot(
-    onNavigateToMain: () -> Unit,
+    onNavigateToHome: () -> Unit,
     viewModel: AuthenticationViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -60,7 +59,7 @@ fun AuthenticationRoot(
             is AuthenticationEvents.OpenBrowser -> openBrowser(event.url)
             is AuthenticationEvents.CopyToClipboard -> copyToClipboard(event.label, event.text)
             AuthenticationEvents.OnNavigateToMain -> {
-                onNavigateToMain()
+                onNavigateToHome()
             }
         }
     }

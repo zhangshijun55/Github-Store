@@ -6,19 +6,29 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import zed.rainxch.githubstore.core.presentation.utils.AppContextHolder
 import zed.rainxch.githubstore.app.di.initKoin
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        var shouldShowSplashScreen = true
+
+        installSplashScreen().setKeepOnScreenCondition {
+            shouldShowSplashScreen
+        }
+
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // Initialize app context for opening browser from shared code
         AppContextHolder.appContext = applicationContext
 
         setContent {
-            App()
+            App(
+                onAuthenticationChecked = {
+                    shouldShowSplashScreen = false
+                }
+            )
         }
     }
 }

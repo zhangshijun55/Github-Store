@@ -9,6 +9,7 @@ import androidx.security.crypto.MasterKey.*
 import zed.rainxch.githubstore.BuildConfig
 import kotlinx.serialization.json.Json
 import zed.rainxch.githubstore.core.presentation.utils.AppContextHolder
+import androidx.core.content.edit
 
 actual fun getGithubClientId(): String = BuildConfig.GITHUB_CLIENT_ID
 
@@ -44,7 +45,12 @@ actual object DefaultTokenStore : TokenStore {
     private val json = Json { ignoreUnknownKeys = true }
 
     actual override suspend fun save(token: DeviceTokenSuccess) {
-        prefs.edit().putString("token", json.encodeToString(DeviceTokenSuccess.serializer(), token)).apply()
+        prefs.edit {
+            putString(
+                "token",
+                json.encodeToString(DeviceTokenSuccess.serializer(), token)
+            )
+        }
     }
 
     actual override suspend fun load(): DeviceTokenSuccess? {
@@ -53,6 +59,6 @@ actual object DefaultTokenStore : TokenStore {
     }
 
     actual override suspend fun clear() {
-        prefs.edit().remove("token").apply()
+        prefs.edit { remove("token") }
     }
 }

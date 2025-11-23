@@ -1,9 +1,13 @@
 package zed.rainxch.githubstore.app.di
 
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import zed.rainxch.githubstore.MainViewModel
 import zed.rainxch.githubstore.core.data.DefaultTokenDataSource
 import zed.rainxch.githubstore.core.data.TokenDataSource
+import zed.rainxch.githubstore.network.buildAuthedGitHubHttpClient
 import zed.rainxch.githubstore.feature.auth.data.repository.AuthRepositoryImpl
 import zed.rainxch.githubstore.feature.auth.domain.*
 import zed.rainxch.githubstore.feature.auth.domain.repository.AuthRepository
@@ -12,6 +16,10 @@ import zed.rainxch.githubstore.feature.auth.presentation.AuthenticationViewModel
 // Core/shared modules
 val coreModule: Module = module {
     single<TokenDataSource> { DefaultTokenDataSource() }
+    // Authed GitHub client that reads token snapshot from TokenDataSource on every request
+    single { buildAuthedGitHubHttpClient(get()) }
+
+    viewModelOf(::MainViewModel)
 }
 
 val authModule: Module = module {
@@ -24,5 +32,5 @@ val authModule: Module = module {
     factory { LogoutUseCase(get()) }
 
     // Presentation
-    factory { AuthenticationViewModel(get(), get(), get(), get()) }
+    viewModel { AuthenticationViewModel(get(), get(), get(), get()) }
 }

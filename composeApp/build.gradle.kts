@@ -1,6 +1,6 @@
-import java.util.Properties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             // Secure storage (direct coordinate to avoid catalog accessor mismatch)
             implementation(libs.androidx.security.crypto)
+            implementation(libs.core.splashscreen)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -73,6 +74,10 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.navigation.compose)
+
+            implementation(libs.kermit)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
