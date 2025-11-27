@@ -158,26 +158,14 @@ If your repo meets these conditions, GithubStore can find it through search and 
 
 ---
 
-## 📦 Getting started (WIP)
+## 🔑 Configuration
 
-> The repository is currently private while the core is being finalized.  
-> Once it goes public, this section will include:
-> - Installation instructions for Android APK and desktop builds.
-> - Instructions for building from source.
-> - Contribution guidelines and issue templates.
+GithubStore uses a GitHub OAuth app for authentication and API rate‑limit isolation.
 
----
-
-## 🤝 Contributing
-
-Planned contribution areas once the repo is public:
-
-- New platform heuristics (better detection via topics/languages).
-- Additional asset type support.
-- Improved search filters and ranking.
-- UI/UX enhancements, accessibility, and localization.
-
-Issues and pull requests will be very welcome once the repository is open.
+1. Create a GitHub OAuth app at **GitHub → Settings → Developer settings → OAuth Apps**.
+2. Set the callback URL to `githubstore://callback` (_Not quite important_).
+3. Copy the **Client ID** from the OAuth app.
+4. In your project’s `local.properties`, add:
 
 ---
 
