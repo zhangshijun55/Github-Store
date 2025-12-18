@@ -109,7 +109,6 @@ fun SearchScreen(
             val totalItems = layoutInfo.totalItemsCount
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
 
-            // Trigger when near bottom (within 5 items)
             totalItems > 0 &&
                     lastVisibleItem != null &&
                     lastVisibleItem.index >= (totalItems - 5) &&
@@ -324,13 +323,15 @@ fun SearchScreen(
                     ) {
                         items(
                             items = state.repositories,
-                            key = { it.id },
+                            key = { it.repo.id },
                             contentType = { "repo" }
-                        ) { repository ->
+                        ) { searchRepo ->
                             RepositoryCard(
-                                repository = repository,
+                                repository = searchRepo.repo,
+                                isInstalled = searchRepo.isInstalled,
+                                isUpdateAvailable = searchRepo.isUpdateAvailable,
                                 onClick = {
-                                    onAction(SearchAction.OnRepositoryClick(repository))
+                                    onAction(SearchAction.OnRepositoryClick(searchRepo.repo))
                                 },
                                 modifier = Modifier.animateItem()
                             )

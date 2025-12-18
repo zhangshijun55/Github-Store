@@ -10,10 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,6 +39,8 @@ import zed.rainxch.githubstore.core.presentation.utils.formatUpdatedAt
 @Composable
 fun RepositoryCard(
     repository: GithubRepoSummary,
+    isInstalled: Boolean,
+    isUpdateAvailable: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -129,6 +136,14 @@ fun RepositoryCard(
                 }
             }
 
+            if (isInstalled) {
+                Spacer(Modifier.height(12.dp))
+
+                InstallStatusBadge(
+                    isUpdateAvailable = isUpdateAvailable
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
 
             Text(
@@ -148,16 +163,77 @@ fun RepositoryCard(
     }
 }
 
+@Composable
+fun InstallStatusBadge(
+    isUpdateAvailable: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor = if (isUpdateAvailable) {
+        MaterialTheme.colorScheme.tertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.primaryContainer
+    }
+
+    val textColor = if (isUpdateAvailable) {
+        MaterialTheme.colorScheme.onTertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    }
+
+    val icon = if (isUpdateAvailable) {
+        Icons.Default.Update
+    } else {
+        Icons.Default.CheckCircle
+    }
+
+    val text = if (isUpdateAvailable) {
+        "Update Available"
+    } else {
+        "Installed"
+    }
+
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = backgroundColor
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = textColor
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                color = textColor,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun RepositoryCardPreview() {
     GithubStoreTheme {
         RepositoryCard(
+            isInstalled = false,
             repository = GithubRepoSummary(
                 id = 0L,
                 name = "Hello",
                 fullName = "JIFEOJEF",
-                owner = GithubUser(id = 0L, login = "Skydoves", avatarUrl = "ewfew", htmlUrl = "grgrre"),
+                owner = GithubUser(
+                    id = 0L,
+                    login = "Skydoves",
+                    avatarUrl = "ewfew",
+                    htmlUrl = "grgrre"
+                ),
                 description = "Hello wolrd Hello wolrd Hello wolrd Hello wolrd Hello wolrd",
                 htmlUrl = "",
                 stargazersCount = 20,
@@ -168,7 +244,8 @@ fun RepositoryCardPreview() {
                 updatedAt = "",
                 defaultBranch = ""
             ),
-            onClick = { }
+            onClick = { },
+            isUpdateAvailable = true
         )
     }
 }

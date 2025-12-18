@@ -144,8 +144,6 @@ fun AppHeader(
                     if (installedApp != null) {
                         InstallStatusBadge(
                             isUpdateAvailable = installedApp.isUpdateAvailable,
-                            installedVersion = installedApp.installedVersion,
-                            latestVersion = installedApp.latestVersion
                         )
                     }
                 }
@@ -193,8 +191,6 @@ fun AppHeader(
 @Composable
 fun InstallStatusBadge(
     isUpdateAvailable: Boolean,
-    installedVersion: String,
-    latestVersion: String?,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = if (isUpdateAvailable) {

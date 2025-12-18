@@ -588,9 +588,7 @@ class DetailsViewModel(
     ) {
         try {
             val repo = _state.value.repository ?: return
-            val release = _state.value.latestRelease ?: return
 
-            // Extract actual package name from APK on Android
             var packageName: String
             var appName = repo.name
 
@@ -601,7 +599,13 @@ class DetailsViewModel(
                     appName = apkInfo.appName
                     Logger.d { "Extracted APK info - package: $packageName, name: $appName" }
                 } else {
-                    Logger.e { "Failed to extract APK info for $assetName at $filePath - skipping DB tracking. File exists: ${File(filePath).exists()}, size: ${File(filePath).length()} (expected $assetSize)" }
+                    Logger.e {
+                        "Failed to extract APK info for $assetName at $filePath - skipping DB tracking. File exists: ${
+                            File(
+                                filePath
+                            ).exists()
+                        }, size: ${File(filePath).length()} (expected $assetSize)"
+                    }
                     return
                 }
             } else {
@@ -609,7 +613,6 @@ class DetailsViewModel(
             }
 
             if (isUpdate) {
-                // Update existing app
                 installedAppsRepository.updateAppVersion(
                     packageName = packageName,
                     newVersion = releaseTag,
@@ -619,7 +622,6 @@ class DetailsViewModel(
 
                 Logger.d { "Updated app in database: $packageName to version $releaseTag" }
             } else {
-                // Save new installation
                 val installedApp = InstalledApp(
                     packageName = packageName,
                     repoId = repo.id,
@@ -646,7 +648,7 @@ class DetailsViewModel(
                     releaseNotes = "",
                     systemArchitecture = installer.detectSystemArchitecture().name,
                     fileExtension = assetName.substringAfterLast('.', ""),
-                    isPendingInstall = !isUpdate  // Pending for new installs
+                    isPendingInstall = true
                 )
 
                 installedAppsRepository.saveInstalledApp(installedApp)
@@ -654,7 +656,6 @@ class DetailsViewModel(
                 Logger.d { "Saved new app to database: $packageName, version: $releaseTag" }
             }
 
-            // Update favorite status if this repo is favorited
             if (_state.value.isFavorite) {
                 favoritesRepository.updateFavoriteInstallStatus(
                     repoId = repo.id,

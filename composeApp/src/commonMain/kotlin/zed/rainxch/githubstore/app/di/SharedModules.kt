@@ -140,6 +140,7 @@ val homeModule: Module = module {
     viewModel {
         HomeViewModel(
             homeRepository = get(),
+            installedAppsRepository = get()
         )
     }
 }
@@ -154,7 +155,8 @@ val searchModule: Module = module {
 
     viewModel {
         SearchViewModel(
-            searchRepository = get()
+            searchRepository = get(),
+            installedAppsRepository = get()
         )
     }
 }

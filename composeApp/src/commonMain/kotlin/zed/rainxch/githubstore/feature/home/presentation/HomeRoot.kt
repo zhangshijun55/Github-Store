@@ -47,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import co.touchlab.kermit.Logger
 import githubstore.composeapp.generated.resources.Res
 import githubstore.composeapp.generated.resources.app_icon
 import org.jetbrains.compose.resources.painterResource
@@ -270,13 +269,15 @@ fun HomeScreen(
                     ) {
                         items(
                             items = state.repos,
-                            key = { it.id },
+                            key = { it.repo.id },
                             contentType = { "repo" }
-                        ) { repository ->
+                        ) { homeRepo ->
                             RepositoryCard(
-                                repository = repository,
+                                isInstalled = homeRepo.isInstalled,
+                                isUpdateAvailable = homeRepo.isUpdateAvailable,
+                                repository = homeRepo.repo,
                                 onClick = {
-                                    onAction(HomeAction.OnRepositoryClick(repository))
+                                    onAction(HomeAction.OnRepositoryClick(homeRepo.repo))
                                 },
                                 modifier = Modifier.animateItem()
                             )

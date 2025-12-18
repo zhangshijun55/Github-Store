@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.githubstore.feature.home.domain.model.TrendingPeriod
 import zed.rainxch.githubstore.feature.home.domain.repository.HomeRepository
 import zed.rainxch.githubstore.feature.home.presentation.model.HomeCategory
 
 class HomeViewModel(
     private val homeRepository: HomeRepository,
+    private val installedAppsRepository: InstalledAppsRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -78,8 +80,22 @@ class HomeViewModel(
                     this@HomeViewModel.nextPageIndex = paginatedRepos.nextPageIndex
 
                     _state.update { currentState ->
-                        val rawList = currentState.repos + paginatedRepos.repos
-                        val uniqueList = rawList.distinctBy { it.fullName }
+                        val newReposWithStatus = paginatedRepos.repos.map { repo ->
+                            val isInstalled = installedAppsRepository.isAppInstalled(repo.id)
+                            val app = installedAppsRepository.getAppByRepoId(repo.id)
+                            val isUpdateAvailable = app?.packageName?.let {
+                                installedAppsRepository.checkForUpdates(it)
+                            } == true
+
+                            HomeRepo(
+                                isInstalled = isInstalled,
+                                isUpdateAvailable = isUpdateAvailable,
+                                repo = repo
+                            )
+                        }
+
+                        val rawList = currentState.repos + newReposWithStatus
+                        val uniqueList = rawList.distinctBy { it.repo.fullName }
 
                         currentState.copy(
                             repos = uniqueList,

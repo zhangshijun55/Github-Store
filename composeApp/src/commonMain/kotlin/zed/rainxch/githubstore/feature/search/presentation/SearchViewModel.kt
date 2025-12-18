@@ -12,10 +12,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
+import zed.rainxch.githubstore.feature.home.presentation.HomeRepo
 import zed.rainxch.githubstore.feature.search.domain.repository.SearchRepository
 
 class SearchViewModel(
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val installedAppsRepository: InstalledAppsRepository
 ) : ViewModel() {
 
     private var currentSearchJob: Job? = null
@@ -71,7 +74,19 @@ class SearchViewModel(
                             } else {
                                 currentState.repositories + paginatedRepos.repos
                             }
-                            val updatedRepos = merged.distinctBy { it.id }
+                            val updatedRepos = paginatedRepos.repos.map { repo ->
+                                val isInstalled = installedAppsRepository.isAppInstalled(repo.id)
+                                val app = installedAppsRepository.getAppByRepoId(repo.id)
+                                val isUpdateAvailable = app?.packageName?.let {
+                                    installedAppsRepository.checkForUpdates(it)
+                                } == true
+
+                                SearchRepo(
+                                    isInstalled = isInstalled,
+                                    isUpdateAvailable = isUpdateAvailable,
+                                    repo = repo
+                                )
+                            }
 
                             currentState.copy(
                                 repositories = updatedRepos,
