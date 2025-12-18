@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
@@ -11,6 +10,8 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.kotest)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 val appVersionName = "1.3.0"
@@ -106,21 +107,29 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
 
+            // Date-time
             implementation(libs.kotlinx.datetime)
 
-            implementation(libs.multiplatform.markdown.renderer)
-            implementation(libs.multiplatform.markdown.renderer.coil3)
-
-            implementation(libs.androidx.datastore)
-            implementation(libs.androidx.datastore.preferences)
-
-            implementation(libs.liquid)
-
+            // Navigation 3
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.jetbrains.lifecycle.viewmodel)
             implementation(libs.jetbrains.lifecycle.viewmodel.navigation3)
 
+            // Markdown
+            implementation(libs.multiplatform.markdown.renderer)
+            implementation(libs.multiplatform.markdown.renderer.coil3)
+
+            // Liquid
+            implementation(libs.liquid)
+
+            // Data store
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+
+            // Room
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -201,6 +210,10 @@ tasks.named<Test>("jvmTest") {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 compose.desktop {
