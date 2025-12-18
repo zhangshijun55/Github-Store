@@ -407,17 +407,23 @@ val amberOrangeDark = darkColorScheme(
 fun GithubStoreTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     appTheme: AppTheme = AppTheme.OCEAN,
+    isAmoledTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val baseColorScheme = when {
         appTheme == AppTheme.DYNAMIC -> {
             getDynamicColorScheme(darkTheme) ?: run {
-                if (darkTheme) AppTheme.OCEAN.darkScheme!! else AppTheme.OCEAN.lightScheme!!
+                if (darkTheme) AppTheme.OCEAN.darkScheme else AppTheme.OCEAN.lightScheme
             }
         }
-
         darkTheme -> appTheme.darkScheme!!
         else -> appTheme.lightScheme!!
+    }
+
+    val colorScheme = if (darkTheme && isAmoledTheme) {
+        baseColorScheme?.toAmoled()
+    } else {
+        baseColorScheme
     }
 
     MaterialExpressiveTheme(

@@ -54,9 +54,15 @@ class SettingsViewModel(
         viewModelScope.launch {
             themesRepository.getThemeColor().collect { theme ->
                 _state.update {
-                    it.copy(
-                        selectedThemeColor = theme
-                    )
+                    it.copy(selectedThemeColor = theme)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            themesRepository.getAmoledTheme().collect { isAmoled ->
+                _state.update {
+                    it.copy(isAmoledThemeEnabled = isAmoled)
                 }
             }
         }
@@ -73,6 +79,12 @@ class SettingsViewModel(
             is SettingsAction.OnThemeColorSelected -> {
                 viewModelScope.launch {
                     themesRepository.setThemeColor(action.themeColor)
+                }
+            }
+
+            is SettingsAction.OnAmoledThemeToggled -> {
+                viewModelScope.launch {
+                    themesRepository.setAmoledTheme(action.enabled)
                 }
             }
 

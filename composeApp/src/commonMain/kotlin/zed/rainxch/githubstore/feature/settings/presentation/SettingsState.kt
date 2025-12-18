@@ -5,5 +5,6 @@ import zed.rainxch.githubstore.core.presentation.model.AppTheme
 data class SettingsState(
     val selectedThemeColor: AppTheme = AppTheme.OCEAN,
     val isLogoutDialogVisible: Boolean = false,
-    val isUserLoggedIn: Boolean = false
+    val isUserLoggedIn: Boolean = false,
+    val isAmoledThemeEnabled: Boolean = false,
 )

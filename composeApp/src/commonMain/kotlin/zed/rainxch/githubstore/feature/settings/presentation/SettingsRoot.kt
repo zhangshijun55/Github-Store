@@ -140,6 +140,10 @@ fun SettingsScreen(
                 selectedThemeColor = state.selectedThemeColor,
                 onThemeColorSelected = { theme ->
                     onAction(SettingsAction.OnThemeColorSelected(theme))
+                },
+                isAmoledThemeEnabled = state.isAmoledThemeEnabled,
+                onAmoledThemeToggled = { enabled ->
+                    onAction(SettingsAction.OnAmoledThemeToggled(enabled))
                 }
             )
 

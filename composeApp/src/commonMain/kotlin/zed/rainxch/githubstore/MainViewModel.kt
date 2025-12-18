@@ -53,6 +53,15 @@ class MainViewModel(
                     }
                 }
         }
+        viewModelScope.launch {
+            themesRepository
+                .getAmoledTheme()
+                .collect { isAmoled ->
+                    _state.update {
+                        it.copy(isAmoledTheme = isAmoled)
+                    }
+                }
+        }
 
         viewModelScope.launch {
             appStateManager.appState.collect { appState ->
@@ -66,7 +75,7 @@ class MainViewModel(
         }
     }
 
-    fun onAction(action : MainAction) {
+    fun onAction(action: MainAction) {
         when (action) {
             MainAction.DismissRateLimitDialog -> {
                 appStateManager.dismissRateLimitDialog()

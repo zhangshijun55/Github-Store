@@ -2,7 +2,6 @@ package zed.rainxch.githubstore
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
@@ -37,7 +36,8 @@ fun App(
     }
 
     GithubStoreTheme(
-        appTheme = state.currentColorTheme
+        appTheme = state.currentColorTheme,
+        isAmoledTheme = state.isAmoledTheme
     ) {
         LaunchedEffect(state.isCheckingAuth) {
             if (!state.isCheckingAuth) {
