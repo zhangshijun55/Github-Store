@@ -6,6 +6,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import zed.rainxch.githubstore.core.data.AndroidApkInfoExtractor
+import zed.rainxch.githubstore.core.data.AndroidLocalizationManager
 import zed.rainxch.githubstore.core.data.AndroidPackageMonitor
 import zed.rainxch.githubstore.core.data.services.PackageMonitor
 import zed.rainxch.githubstore.core.data.local.data_store.createDataStore
@@ -25,6 +26,7 @@ import zed.rainxch.githubstore.feature.details.data.AndroidInstaller
 import zed.rainxch.githubstore.core.data.services.Downloader
 import zed.rainxch.githubstore.core.data.services.FileLocationsProvider
 import zed.rainxch.githubstore.core.data.services.Installer
+import zed.rainxch.githubstore.core.data.services.LocalizationManager
 
 actual val platformModule: Module = module {
     single<Downloader> {
@@ -69,6 +71,10 @@ actual val platformModule: Module = module {
 
     single<PackageMonitor> {
         AndroidPackageMonitor(androidContext())
+    }
+
+    single<LocalizationManager> {
+        AndroidLocalizationManager()
     }
 
     single<AppLauncher> {

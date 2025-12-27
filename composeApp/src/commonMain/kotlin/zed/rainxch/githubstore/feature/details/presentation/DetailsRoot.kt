@@ -203,8 +203,11 @@ fun DetailsScreen(
                     stats(repoStats = stats)
                 }
 
-                state.readmeMarkdown?.let { readmeMarkdown ->
-                    about(readmeMarkdown)
+                state.readmeMarkdown?.let {
+                    about(
+                        readmeMarkdown = state.readmeMarkdown,
+                        readmeLanguage = state.readmeLanguage
+                    )
                 }
 
                 state.latestRelease?.let { latestRelease ->

@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import zed.rainxch.githubstore.core.data.DesktopApkInfoExtractor
+import zed.rainxch.githubstore.core.data.DesktopLocalizationManager
 import zed.rainxch.githubstore.core.data.DesktopPackageMonitor
 import zed.rainxch.githubstore.core.data.services.PackageMonitor
 import zed.rainxch.githubstore.core.data.local.data_store.createDataStore
@@ -22,6 +23,7 @@ import zed.rainxch.githubstore.feature.auth.data.TokenStore
 import zed.rainxch.githubstore.core.data.services.Downloader
 import zed.rainxch.githubstore.core.data.services.FileLocationsProvider
 import zed.rainxch.githubstore.core.data.services.Installer
+import zed.rainxch.githubstore.core.data.services.LocalizationManager
 import zed.rainxch.githubstore.feature.details.data.DesktopDownloader
 import zed.rainxch.githubstore.feature.details.data.DesktopFileLocationsProvider
 import zed.rainxch.githubstore.feature.details.data.DesktopInstaller
@@ -71,6 +73,10 @@ actual val platformModule: Module = module {
 
     single<PackageMonitor> {
         DesktopPackageMonitor()
+    }
+
+    single<LocalizationManager> {
+        DesktopLocalizationManager()
     }
 
     single<AppLauncher> {

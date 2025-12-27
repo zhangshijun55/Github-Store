@@ -183,7 +183,8 @@ val detailsModule: Module = module {
     single<DetailsRepository> {
         DetailsRepositoryImpl(
             github = get(),
-            appStateManager = get()
+            appStateManager = get(),
+            localizationManager = get()
         )
     }
 

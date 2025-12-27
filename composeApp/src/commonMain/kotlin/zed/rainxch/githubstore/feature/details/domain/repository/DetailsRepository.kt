@@ -5,12 +5,24 @@ import zed.rainxch.githubstore.core.domain.model.GithubRepoSummary
 import zed.rainxch.githubstore.core.domain.model.GithubUserProfile
 import zed.rainxch.githubstore.feature.details.domain.model.RepoStats
 
+typealias ReadmeContent = String
+typealias ReadmePath = String
+typealias LanguageCode = String
+
 interface DetailsRepository {
     suspend fun getRepositoryById(id: Long): GithubRepoSummary
 
-    suspend fun getLatestPublishedRelease(owner: String, repo: String, defaultBranch: String): GithubRelease?
+    suspend fun getLatestPublishedRelease(
+        owner: String,
+        repo: String,
+        defaultBranch: String
+    ): GithubRelease?
 
-    suspend fun getReadme(owner: String, repo: String, defaultBranch: String): String?
+    suspend fun getReadme(
+        owner: String,
+        repo: String,
+        defaultBranch: String
+    ): Triple<ReadmeContent, LanguageCode?, ReadmePath>?
 
     suspend fun getRepoStats(owner: String, repo: String): RepoStats
 

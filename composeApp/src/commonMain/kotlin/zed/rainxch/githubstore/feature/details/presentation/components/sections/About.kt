@@ -1,5 +1,7 @@
 package zed.rainxch.githubstore.feature.details.presentation.components.sections
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,11 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
 import com.mikepenz.markdown.compose.Markdown
 import io.github.fletchmckee.liquid.liquefiable
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
@@ -23,7 +25,10 @@ import zed.rainxch.githubstore.feature.details.presentation.utils.MarkdownImageT
 import zed.rainxch.githubstore.feature.details.presentation.utils.rememberMarkdownColors
 import zed.rainxch.githubstore.feature.details.presentation.utils.rememberMarkdownTypography
 
-fun LazyListScope.about(readmeMarkdown: String) {
+fun LazyListScope.about(
+    readmeMarkdown: String,
+    readmeLanguage: String?,
+) {
     item {
         val liquidState = LocalTopbarLiquidState.current
 
@@ -31,15 +36,31 @@ fun LazyListScope.about(readmeMarkdown: String) {
 
         Spacer(Modifier.height(16.dp))
 
-        Text(
-            text = "About this app",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
+        Row(
             modifier = Modifier
-                .padding(bottom = 8.dp)
-                .liquefiable(liquidState)
-        )
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "About this app",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.liquefiable(liquidState)
+            )
+
+            readmeLanguage?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.liquefiable(liquidState)
+                )
+            }
+        }
     }
 
     item {

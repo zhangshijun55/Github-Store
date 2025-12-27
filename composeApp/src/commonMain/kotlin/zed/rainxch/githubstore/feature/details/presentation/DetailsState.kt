@@ -28,6 +28,7 @@ data class DetailsState(
 
     val stats: RepoStats? = null,
     val readmeMarkdown: String? = null,
+    val readmeLanguage: String? = null,
 
     val installLogs: List<InstallLogItem> = emptyList(),
 
