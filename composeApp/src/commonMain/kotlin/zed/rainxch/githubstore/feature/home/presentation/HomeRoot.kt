@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -138,37 +139,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    Image(
-                        painter = painterResource(Res.drawable.app_icon),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                },
-                title = {
-                    Text(
-                        text = stringResource(Res.string.app_name),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.padding(start = 4.dp),
-                        maxLines = 2,
-                        softWrap = false,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                actions = {
-                    topbarActions(
-                        state = state,
-                        onAction = onAction
-                    )
-                },
-                modifier = Modifier.padding(12.dp)
-            )
+            TopAppBar(state, onAction)
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
@@ -178,140 +149,89 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.primaryContainer, CircleShape
-                    )
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                HomeCategory.entries.forEach { category ->
-                    HomeFilterChips(
-                        selectedCategory = state.currentCategory,
-                        category = category,
-                        onClick = {
-                            onAction(HomeAction.SwitchCategory(category))
+            FilterChips(state, onAction)
+
+            Box(Modifier.fillMaxSize()) {
+                LoadingState(state)
+
+                ErrorState(state, onAction)
+
+                MainState(state, listState, onAction)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainState(
+    state: HomeState,
+    listState: LazyStaggeredGridState,
+    onAction: (HomeAction) -> Unit
+) {
+    if (state.repos.isNotEmpty()) {
+        LazyVerticalStaggeredGrid(
+            state = listState,
+            columns = StaggeredGridCells.Adaptive(350.dp),
+            verticalItemSpacing = 12.dp,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                items = state.repos,
+                key = { it.repo.id },
+                contentType = { "repo" }
+            ) { homeRepo ->
+                RepositoryCard(
+                    isInstalled = homeRepo.isInstalled,
+                    isUpdateAvailable = homeRepo.isUpdateAvailable,
+                    repository = homeRepo.repo,
+                    onClick = {
+                        onAction(HomeAction.OnRepositoryClick(homeRepo.repo))
+                    },
+                    modifier = Modifier.animateItem()
+                )
+            }
+
+            if (state.isLoadingMore) {
+                item(key = "loading_indicator") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = stringResource(Res.string.home_loading_more),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
-                    )
+                    }
                 }
             }
 
-            Box(Modifier.fillMaxSize()) {
-                if (state.isLoading && state.repos.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularWavyProgressIndicator()
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = stringResource(Res.string.home_finding_repositories),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-
-                if (state.errorMessage != null && state.repos.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = state.errorMessage,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            GithubStoreButton(
-                                text = stringResource(Res.string.home_retry),
-                                onClick = {
-                                    onAction(HomeAction.Retry)
-                                }
-                            )
-                        }
-                    }
-                }
-
-                if (state.repos.isNotEmpty()) {
-                    LazyVerticalStaggeredGrid(
-                        state = listState,
-                        columns = StaggeredGridCells.Adaptive(350.dp),
-                        verticalItemSpacing = 12.dp,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(
-                            items = state.repos,
-                            key = { it.repo.id },
-                            contentType = { "repo" }
-                        ) { homeRepo ->
-                            RepositoryCard(
-                                isInstalled = homeRepo.isInstalled,
-                                isUpdateAvailable = homeRepo.isUpdateAvailable,
-                                repository = homeRepo.repo,
-                                onClick = {
-                                    onAction(HomeAction.OnRepositoryClick(homeRepo.repo))
-                                },
-                                modifier = Modifier.animateItem()
-                            )
-                        }
-
-                        if (state.isLoadingMore) {
-                            item(key = "loading_indicator") {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp)
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Text(
-                                            text = stringResource(Res.string.home_loading_more),
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!state.hasMorePages && !state.isLoadingMore) {
-                            item(key = "end_message") {
-                                Text(
-                                    text = stringResource(Res.string.home_no_more_repositories),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
-                        }
-                    }
+            if (!state.hasMorePages && !state.isLoadingMore) {
+                item(key = "end_message") {
+                    Text(
+                        text = stringResource(Res.string.home_no_more_repositories),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
         }
@@ -320,7 +240,128 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun topbarActions(
+private fun LoadingState(state: HomeState) {
+    if (state.isLoading && state.repos.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularWavyProgressIndicator()
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(Res.string.home_finding_repositories),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorState(
+    state: HomeState,
+    onAction: (HomeAction) -> Unit
+) {
+    if (state.errorMessage != null && state.repos.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = state.errorMessage,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                GithubStoreButton(
+                    text = stringResource(Res.string.home_retry),
+                    onClick = {
+                        onAction(HomeAction.Retry)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterChips(
+    state: HomeState,
+    onAction: (HomeAction) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.primaryContainer, CircleShape
+            )
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        HomeCategory.entries.forEach { category ->
+            HomeFilterChips(
+                selectedCategory = state.currentCategory,
+                category = category,
+                onClick = {
+                    onAction(HomeAction.SwitchCategory(category))
+                }
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TopAppBar(
+    state: HomeState,
+    onAction: (HomeAction) -> Unit
+) {
+    TopAppBar(
+        navigationIcon = {
+            Image(
+                painter = painterResource(Res.drawable.app_icon),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        },
+        title = {
+            Text(
+                text = stringResource(Res.string.app_name),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(start = 4.dp),
+                maxLines = 2,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        actions = {
+            TopbarActions(
+                state = state,
+                onAction = onAction
+            )
+        },
+        modifier = Modifier.padding(12.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun TopbarActions(
     state: HomeState,
     onAction: (HomeAction) -> Unit
 ) {
@@ -334,7 +375,7 @@ private fun topbarActions(
                 onAction(HomeAction.OnSearchClick)
             },
             colors = IconButtonDefaults.iconButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                contentColor = MaterialTheme.colorScheme.onBackground
             )
         ) {
             Icon(
@@ -351,7 +392,7 @@ private fun topbarActions(
                     onAction(HomeAction.OnAppsClick)
                 },
                 colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    contentColor = MaterialTheme.colorScheme.onBackground
                 )
             ) {
                 Box(
@@ -384,7 +425,7 @@ private fun topbarActions(
                 onAction(HomeAction.OnSettingsClick)
             },
             colors = IconButtonDefaults.iconButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                contentColor = MaterialTheme.colorScheme.onBackground
             )
         ) {
             Icon(
