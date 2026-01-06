@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import zed.rainxch.githubstore.MainViewModel
 import zed.rainxch.githubstore.app.app_state.AppStateManager
@@ -13,11 +12,11 @@ import zed.rainxch.githubstore.core.data.services.PackageMonitor
 import zed.rainxch.githubstore.core.data.data_source.DefaultTokenDataSource
 import zed.rainxch.githubstore.core.data.data_source.TokenDataSource
 import zed.rainxch.githubstore.core.data.local.db.AppDatabase
-import zed.rainxch.githubstore.core.data.repository.FavoritesRepositoryImpl
+import zed.rainxch.githubstore.core.data.repository.FavouritesRepositoryImpl
 import zed.rainxch.githubstore.core.data.repository.InstalledAppsRepositoryImpl
 import zed.rainxch.githubstore.core.data.repository.ThemesRepositoryImpl
 import zed.rainxch.githubstore.core.domain.getPlatform
-import zed.rainxch.githubstore.core.domain.repository.FavoritesRepository
+import zed.rainxch.githubstore.core.domain.repository.FavouritesRepository
 import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.githubstore.core.domain.repository.ThemesRepository
 import zed.rainxch.githubstore.feature.apps.data.repository.AppsRepositoryImpl
@@ -25,7 +24,6 @@ import zed.rainxch.githubstore.feature.apps.domain.repository.AppsRepository
 import zed.rainxch.githubstore.feature.apps.presentation.AppsViewModel
 import zed.rainxch.githubstore.network.buildAuthedGitHubHttpClient
 import zed.rainxch.githubstore.feature.auth.data.repository.AuthenticationRepositoryImpl
-import zed.rainxch.githubstore.feature.auth.domain.*
 import zed.rainxch.githubstore.feature.auth.domain.repository.AuthenticationRepository
 import zed.rainxch.githubstore.feature.auth.presentation.AuthenticationViewModel
 import zed.rainxch.githubstore.feature.details.data.repository.DetailsRepositoryImpl
@@ -34,6 +32,7 @@ import zed.rainxch.githubstore.feature.details.presentation.DetailsViewModel
 import zed.rainxch.githubstore.core.data.services.Downloader
 import zed.rainxch.githubstore.core.data.services.Installer
 import zed.rainxch.githubstore.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.githubstore.feature.favourites.FavouritesViewModel
 import zed.rainxch.githubstore.feature.home.data.data_source.CachedTrendingDataSource
 import zed.rainxch.githubstore.feature.home.data.repository.HomeRepositoryImpl
 import zed.rainxch.githubstore.feature.home.domain.repository.HomeRepository
@@ -101,8 +100,8 @@ val coreModule: Module = module {
     }
 
     // Repositories
-    single<FavoritesRepository> {
-        FavoritesRepositoryImpl(
+    single<FavouritesRepository> {
+        FavouritesRepositoryImpl(
             dao = get(),
             installedAppsDao = get(),
             detailsRepository = get()
@@ -173,7 +172,8 @@ val homeModule: Module = module {
             homeRepository = get(),
             installedAppsRepository = get(),
             platform = get(),
-            syncInstalledAppsUseCase = get()
+            syncInstalledAppsUseCase = get(),
+            favouritesRepository = get()
         )
     }
 }
@@ -193,7 +193,16 @@ val searchModule: Module = module {
         SearchViewModel(
             searchRepository = get(),
             installedAppsRepository = get(),
-            syncInstalledAppsUseCase = get()
+            syncInstalledAppsUseCase = get(),
+            favouritesRepository = get()
+        )
+    }
+}
+val favouritesModule: Module = module {
+    // ViewModel
+    viewModel {
+        FavouritesViewModel(
+            favouritesRepository = get()
         )
     }
 }
@@ -218,7 +227,7 @@ val detailsModule: Module = module {
             platform = get(),
             helper = get(),
             installedAppsRepository = get(),
-            favoritesRepository = get(),
+            favouritesRepository = get(),
             packageMonitor = get<PackageMonitor>(),
             syncInstalledAppsUseCase = get()
         )

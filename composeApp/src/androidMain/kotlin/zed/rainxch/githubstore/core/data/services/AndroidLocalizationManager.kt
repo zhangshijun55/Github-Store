@@ -1,10 +1,10 @@
-package zed.rainxch.githubstore.core.data
+package zed.rainxch.githubstore.core.data.services
 
-import zed.rainxch.githubstore.core.data.services.LocalizationManager
+import java.util.Locale
 
-class DesktopLocalizationManager : LocalizationManager {
+class AndroidLocalizationManager : LocalizationManager {
     override fun getCurrentLanguageCode(): String {
-        val locale = java.util.Locale.getDefault()
+        val locale = Locale.getDefault()
         val language = locale.language
         val country = locale.country
         return if (country.isNotEmpty()) {
@@ -13,8 +13,8 @@ class DesktopLocalizationManager : LocalizationManager {
             language
         }
     }
-    
+
     override fun getPrimaryLanguageCode(): String {
-        return java.util.Locale.getDefault().language
+        return Locale.getDefault().language
     }
 }

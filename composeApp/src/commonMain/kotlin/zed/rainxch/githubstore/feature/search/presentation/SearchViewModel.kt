@@ -7,11 +7,7 @@ import githubstore.composeapp.generated.resources.Res
 import githubstore.composeapp.generated.resources.no_repositories_found
 import githubstore.composeapp.generated.resources.search_failed
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,14 +15,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import zed.rainxch.githubstore.core.domain.repository.FavouritesRepository
 import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.githubstore.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.githubstore.core.presentation.model.DiscoveryRepository
 import zed.rainxch.githubstore.feature.search.domain.repository.SearchRepository
 
 class SearchViewModel(
     private val searchRepository: SearchRepository,
     private val installedAppsRepository: InstalledAppsRepository,
-    private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase
+    private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase,
+    private val favouritesRepository: FavouritesRepository
 ) : ViewModel() {
 
     private var currentSearchJob: Job? = null
@@ -39,6 +38,7 @@ class SearchViewModel(
     init {
         syncSystemState()
         observeInstalledApps()
+        observeFavouriteApps()
     }
 
     private fun syncSystemState() {
@@ -61,10 +61,27 @@ class SearchViewModel(
                 _state.update { current ->
                     current.copy(
                         repositories = current.repositories.map { searchRepo ->
-                            val app = installedMap[searchRepo.repo.id]
+                            val app = installedMap[searchRepo.repository.id]
                             searchRepo.copy(
                                 isInstalled = app != null,
                                 isUpdateAvailable = app?.isUpdateAvailable ?: false
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+    private fun observeFavouriteApps() {
+        viewModelScope.launch {
+            favouritesRepository.getAllFavorites().collect { favoriteRepos ->
+                val installedMap = favoriteRepos.associateBy { it.repoId }
+                _state.update { current ->
+                    current.copy(
+                        repositories = current.repositories.map { searchRepo ->
+                            val app = installedMap[searchRepo.repository.id]
+                            searchRepo.copy(
+                                isFavourite = app != null
                             )
                         }
                     )
@@ -102,8 +119,14 @@ class SearchViewModel(
             }
 
             try {
-                val installedAppsSnapshot = installedAppsRepository.getAllInstalledApps().first()
-                val installedMap = installedAppsSnapshot.associateBy { it.repoId }
+                val installedMap = installedAppsRepository
+                    .getAllInstalledApps()
+                    .first()
+                    .associateBy { it.repoId }
+                val favoritesMap = favouritesRepository
+                    .getAllFavorites()
+                    .first()
+                    .associateBy { it.repoId }
 
                 searchRepository
                     .searchRepositories(
@@ -117,29 +140,33 @@ class SearchViewModel(
 
                         val newReposWithStatus = paginatedRepos.repos.map { repo ->
                             val app = installedMap[repo.id]
-                            SearchRepo(
+                            val favourite = favoritesMap[repo.id]
+
+                            DiscoveryRepository(
                                 isInstalled = app != null,
+                                isFavourite = favourite != null,
                                 isUpdateAvailable = app?.isUpdateAvailable ?: false,
-                                repo = repo
+                                repository = repo
                             )
                         }
 
                         _state.update { currentState ->
-                            val mergedMap = LinkedHashMap<Long, SearchRepo>()
+                            val mergedMap = LinkedHashMap<Long, DiscoveryRepository>()
 
                             currentState.repositories.forEach { r ->
-                                mergedMap[r.repo.id] = r
+                                mergedMap[r.repository.id] = r
                             }
 
                             newReposWithStatus.forEach { r ->
-                                val existing = mergedMap[r.repo.id]
+                                val existing = mergedMap[r.repository.id]
                                 if (existing == null) {
-                                    mergedMap[r.repo.id] = r
+                                    mergedMap[r.repository.id] = r
                                 } else {
-                                    mergedMap[r.repo.id] = existing.copy(
+                                    mergedMap[r.repository.id] = existing.copy(
                                         isInstalled = r.isInstalled,
                                         isUpdateAvailable = r.isUpdateAvailable,
-                                        repo = r.repo
+                                        isFavourite = r.isFavourite,
+                                        repository = r.repository
                                     )
                                 }
                             }

@@ -1,6 +1,5 @@
 package zed.rainxch.githubstore.feature.search.presentation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,7 +62,6 @@ import githubstore.composeapp.generated.resources.navigate_back
 import githubstore.composeapp.generated.resources.results_found
 import githubstore.composeapp.generated.resources.retry
 import githubstore.composeapp.generated.resources.search_repositories_hint
-import githubstore.composeapp.generated.resources.sort_by
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -73,9 +71,7 @@ import zed.rainxch.githubstore.core.presentation.components.RepositoryCard
 import zed.rainxch.githubstore.core.presentation.theme.GithubStoreTheme
 import zed.rainxch.githubstore.feature.search.domain.model.ProgrammingLanguage
 import zed.rainxch.githubstore.feature.search.domain.model.SearchPlatformType
-import zed.rainxch.githubstore.feature.search.domain.model.SortBy
 import zed.rainxch.githubstore.feature.search.presentation.components.LanguageFilterBottomSheet
-import zed.rainxch.githubstore.feature.search.presentation.components.SortByBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -340,14 +336,12 @@ fun SearchScreen(
                     ) {
                         items(
                             items = state.repositories,
-                            key = { it.repo.id },
-                        ) { searchRepo ->
+                            key = { it.repository.id },
+                        ) { discoveryRepository ->
                             RepositoryCard(
-                                repository = searchRepo.repo,
-                                isInstalled = searchRepo.isInstalled,
-                                isUpdateAvailable = searchRepo.isUpdateAvailable,
+                                discoveryRepository = discoveryRepository,
                                 onClick = {
-                                    onAction(SearchAction.OnRepositoryClick(searchRepo.repo))
+                                    onAction(SearchAction.OnRepositoryClick(discoveryRepository.repository))
                                 },
                                 modifier = Modifier.animateItem()
                             )

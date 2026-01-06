@@ -247,4 +247,17 @@
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>
 
+    <string name="added_to_favourites">Repository added to favourites</string>
+    <string name="removed_from_favourites">Repository removed from favourites</string>
+    <string name="add_to_favourites">Add to favourites</string>
+    <string name="remove_from_favourites">Remove from favourites</string>
+    <string name="favourites">Favourites</string>
+
+    <string name="added_just_now">added just now</string>
+    <string name="added_hours_ago">added %1$d hour(s) ago</string>
+    <string name="added_yesterday">added yesterday</string>
+    <string name="added_days_ago">added %1$d day(s) ago</string>
+    <string name="added_on_date">added on %1$s</string>
+
+
 </resources>

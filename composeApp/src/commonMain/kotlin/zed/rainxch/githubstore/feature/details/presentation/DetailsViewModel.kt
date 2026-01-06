@@ -4,21 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import githubstore.composeapp.generated.resources.Res
+import githubstore.composeapp.generated.resources.added_to_favourites
 import githubstore.composeapp.generated.resources.installer_saved_downloads
-import kotlinx.coroutines.Dispatchers
+import githubstore.composeapp.generated.resources.removed_from_favourites
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -31,7 +30,7 @@ import zed.rainxch.githubstore.core.data.local.db.entities.InstallSource
 import zed.rainxch.githubstore.core.data.local.db.entities.InstalledApp
 import zed.rainxch.githubstore.core.domain.Platform
 import zed.rainxch.githubstore.core.domain.model.PlatformType
-import zed.rainxch.githubstore.core.domain.repository.FavoritesRepository
+import zed.rainxch.githubstore.core.domain.repository.FavouritesRepository
 import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.githubstore.core.presentation.utils.BrowserHelper
 import zed.rainxch.githubstore.core.data.services.Downloader
@@ -39,19 +38,18 @@ import zed.rainxch.githubstore.core.data.services.Installer
 import zed.rainxch.githubstore.core.domain.use_cases.SyncInstalledAppsUseCase
 import zed.rainxch.githubstore.feature.details.domain.repository.DetailsRepository
 import zed.rainxch.githubstore.feature.details.presentation.model.LogResult
-import java.io.File
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
 
 class DetailsViewModel(
-    private val repositoryId: Int,
+    private val repositoryId: Long,
     private val detailsRepository: DetailsRepository,
     private val downloader: Downloader,
     private val installer: Installer,
     private val platform: Platform,
     private val helper: BrowserHelper,
     private val installedAppsRepository: InstalledAppsRepository,
-    private val favoritesRepository: FavoritesRepository,
+    private val favouritesRepository: FavouritesRepository,
     private val packageMonitor: PackageMonitor,
     private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase
 ) : ViewModel() {
@@ -88,11 +86,21 @@ class DetailsViewModel(
                     Logger.w { "Sync had issues but continuing: ${syncResult.exceptionOrNull()?.message}" }
                 }
 
-                val repo = detailsRepository.getRepositoryById(repositoryId.toLong())
+                val repo = detailsRepository.getRepositoryById(repositoryId)
+                val isFavoriteDeferred = async {
+                    try {
+                        favouritesRepository.isFavoriteSync(repo.id)
+                    } catch (t: Throwable) {
+                        Logger.e { "Failed to load if repo is favourite: ${t.localizedMessage}" }
+                        false
+                    }
+                }
+                val isFavorite = isFavoriteDeferred.await()
+
                 val owner = repo.owner.login
                 val name = repo.name
 
-                _state.value = _state.value.copy(repository = repo)
+                _state.value = _state.value.copy(repository = repo, isFavorite = isFavorite)
 
                 val latestReleaseDeferred = async {
                     try {
@@ -110,7 +118,7 @@ class DetailsViewModel(
                 val statsDeferred = async {
                     try {
                         detailsRepository.getRepoStats(owner, name)
-                    } catch (t: Throwable) {
+                    } catch (_: Throwable) {
                         null
                     }
                 }
@@ -122,7 +130,7 @@ class DetailsViewModel(
                             repo = name,
                             defaultBranch = repo.defaultBranch
                         )
-                    } catch (t: Throwable) {
+                    } catch (_: Throwable) {
                         null
                     }
                 }
@@ -142,7 +150,8 @@ class DetailsViewModel(
 
                         if (dbApp != null) {
                             if (dbApp.isPendingInstall &&
-                                packageMonitor.isPackageInstalled(dbApp.packageName)) {
+                                packageMonitor.isPackageInstalled(dbApp.packageName)
+                            ) {
                                 installedAppsRepository.updatePendingStatus(
                                     dbApp.packageName,
                                     false
@@ -160,14 +169,6 @@ class DetailsViewModel(
                     }
                 }
 
-                val isFavoriteDeferred = async {
-                    try {
-                        favoritesRepository.isFavoriteSync(repo.id)
-                    } catch (t: Throwable) {
-                        false
-                    }
-                }
-
                 val isObtainiumEnabled = platform.type == PlatformType.ANDROID
                 val isAppManagerEnabled = platform.type == PlatformType.ANDROID
 
@@ -176,7 +177,6 @@ class DetailsViewModel(
                 val readme = readmeDeferred.await()
                 val userProfile = userProfileDeferred.await()
                 val installedApp = installedAppDeferred.await()
-                val isFavorite = isFavoriteDeferred.await()
 
                 val installable = latestRelease?.assets?.filter { asset ->
                     installer.isAssetInstallable(asset.name)
@@ -206,7 +206,6 @@ class DetailsViewModel(
                     isAppManagerAvailable = isAppManagerAvailable,
                     isAppManagerEnabled = isAppManagerEnabled,
                     installedApp = installedApp,
-                    isFavorite = isFavorite
                 )
             } catch (t: Throwable) {
                 Logger.e { "Details load failed: ${t.message}" }
@@ -214,55 +213,6 @@ class DetailsViewModel(
                     isLoading = false,
                     errorMessage = t.message ?: "Failed to load details"
                 )
-            }
-        }
-    }
-
-    private suspend fun syncSystemExistenceAndMigrate() {
-        withContext(Dispatchers.IO) {
-            try {
-                val installedPackageNames = packageMonitor.getAllInstalledPackageNames()
-                val appsInDb = installedAppsRepository.getAllInstalledApps().first()
-
-                appsInDb.forEach { app ->
-                    if (!installedPackageNames.contains(app.packageName)) {
-                        Logger.d { "App ${app.packageName} no longer installed, removing from DB" }
-                        installedAppsRepository.deleteInstalledApp(app.packageName)
-                    } else if (app.installedVersionName == null) {
-                        if (platform.type == PlatformType.ANDROID) {
-                            val systemInfo = packageMonitor.getInstalledPackageInfo(app.packageName)
-                            if (systemInfo != null) {
-                                installedAppsRepository.updateApp(app.copy(
-                                    installedVersionName = systemInfo.versionName,
-                                    installedVersionCode = systemInfo.versionCode,
-                                    latestVersionName = systemInfo.versionName,
-                                    latestVersionCode = systemInfo.versionCode
-                                ))
-                                Logger.d { "Migrated ${app.packageName}: set versionName/code from system" }
-                            } else {
-                                installedAppsRepository.updateApp(app.copy(
-                                    installedVersionName = app.installedVersion,
-                                    installedVersionCode = 0L,
-                                    latestVersionName = app.installedVersion,
-                                    latestVersionCode = 0L
-                                ))
-                                Logger.d { "Migrated ${app.packageName}: fallback to tag" }
-                            }
-                        } else {
-                            installedAppsRepository.updateApp(app.copy(
-                                installedVersionName = app.installedVersion,
-                                installedVersionCode = 0L,
-                                latestVersionName = app.installedVersion,
-                                latestVersionCode = 0L
-                            ))
-                            Logger.d { "Migrated ${app.packageName} (desktop): fallback to tag" }
-                        }
-                    }
-                }
-
-                Logger.d { "System existence sync and data migration completed" }
-            } catch (e: Exception) {
-                Logger.e { "Failed to sync existence or migrate data: ${e.message}" }
             }
         }
     }
@@ -329,7 +279,7 @@ class DetailsViewModel(
                 )
             }
 
-            DetailsAction.ToggleFavorite -> {
+            DetailsAction.OnToggleFavorite -> {
                 viewModelScope.launch {
                     try {
                         val repo = _state.value.repository ?: return@launch
@@ -349,10 +299,22 @@ class DetailsViewModel(
                             lastSyncedAt = System.now().toEpochMilliseconds()
                         )
 
-                        favoritesRepository.toggleFavorite(favoriteRepo)
+                        favouritesRepository.toggleFavorite(favoriteRepo)
 
-                        val newFavoriteState = favoritesRepository.isFavoriteSync(repo.id)
+                        val newFavoriteState = favouritesRepository.isFavoriteSync(repo.id)
                         _state.value = _state.value.copy(isFavorite = newFavoriteState)
+
+                        _events.send(
+                            element = DetailsEvent.OnMessage(
+                                message = getString(
+                                    resource = if (newFavoriteState) {
+                                        Res.string.added_to_favourites
+                                    } else {
+                                        Res.string.removed_from_favourites
+                                    }
+                                )
+                            )
+                        )
 
                     } catch (t: Throwable) {
                         Logger.e { "Failed to toggle favorite: ${t.message}" }
@@ -651,7 +613,7 @@ class DetailsViewModel(
             var packageName: String
             var appName = repo.name
             var versionName: String? = null
-            var versionCode: Long = 0L
+            var versionCode = 0L
 
             if (platform.type == PlatformType.ANDROID && assetName.lowercase().endsWith(".apk")) {
                 val apkInfo = installer.getApkInfoExtractor().extractPackageInfo(filePath)
@@ -716,7 +678,7 @@ class DetailsViewModel(
             }
 
             if (_state.value.isFavorite) {
-                favoritesRepository.updateFavoriteInstallStatus(
+                favouritesRepository.updateFavoriteInstallStatus(
                     repoId = repo.id,
                     installed = true,
                     packageName = packageName
@@ -832,12 +794,8 @@ class DetailsViewModel(
         }
     }
 
-    private fun normalizeVersion(version: String): String {
-        return version.removePrefix("v").removePrefix("V").trim()
-    }
-
     private companion object {
-        const val OBTAINIUM_REPO_ID = 523534328
-        const val APP_MANAGER_REPO_ID = 268006778
+        const val OBTAINIUM_REPO_ID : Long = 523534328
+        const val APP_MANAGER_REPO_ID : Long = 268006778
     }
 }

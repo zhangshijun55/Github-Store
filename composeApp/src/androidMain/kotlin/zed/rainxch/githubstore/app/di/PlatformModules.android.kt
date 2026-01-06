@@ -5,9 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import zed.rainxch.githubstore.core.data.AndroidApkInfoExtractor
-import zed.rainxch.githubstore.core.data.AndroidLocalizationManager
-import zed.rainxch.githubstore.core.data.AndroidPackageMonitor
+import zed.rainxch.githubstore.core.data.services.AndroidApkInfoExtractor
+import zed.rainxch.githubstore.core.data.services.AndroidLocalizationManager
+import zed.rainxch.githubstore.core.data.services.AndroidPackageMonitor
 import zed.rainxch.githubstore.core.data.services.PackageMonitor
 import zed.rainxch.githubstore.core.data.local.data_store.createDataStore
 import zed.rainxch.githubstore.core.data.local.db.AppDatabase
@@ -20,9 +20,9 @@ import zed.rainxch.githubstore.core.presentation.utils.BrowserHelper
 import zed.rainxch.githubstore.core.presentation.utils.ClipboardHelper
 import zed.rainxch.githubstore.feature.auth.data.AndroidTokenStore
 import zed.rainxch.githubstore.feature.auth.data.TokenStore
-import zed.rainxch.githubstore.feature.details.data.AndroidDownloader
-import zed.rainxch.githubstore.feature.details.data.AndroidFileLocationsProvider
-import zed.rainxch.githubstore.feature.details.data.AndroidInstaller
+import zed.rainxch.githubstore.core.data.services.AndroidDownloader
+import zed.rainxch.githubstore.core.data.services.AndroidFileLocationsProvider
+import zed.rainxch.githubstore.core.data.services.AndroidInstaller
 import zed.rainxch.githubstore.core.data.services.Downloader
 import zed.rainxch.githubstore.core.data.services.FileLocationsProvider
 import zed.rainxch.githubstore.core.data.services.Installer

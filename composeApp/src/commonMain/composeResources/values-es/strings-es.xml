@@ -194,4 +194,16 @@
     <string name="theme_dark">Oscuro</string>
     <string name="theme_system">Sistema</string>
 
+    <string name="added_to_favourites">Repositorio añadido a favoritos</string>
+    <string name="removed_from_favourites">Repositorio eliminado de favoritos</string>
+    <string name="add_to_favourites">Añadir a favoritos</string>
+    <string name="remove_from_favourites">Quitar de favoritos</string>
+    <string name="favourites">Favoritos</string>
+
+    <string name="added_just_now">añadido justo ahora</string>
+    <string name="added_hours_ago">añadido hace %1$d hora(s)</string>
+    <string name="added_yesterday">añadido ayer</string>
+    <string name="added_days_ago">añadido hace %1$d día(s)</string>
+    <string name="added_on_date">añadido el %1$s</string>
+
 </resources>

@@ -194,4 +194,16 @@
     <string name="theme_dark">ダーク</string>
     <string name="theme_system">システム</string>
 
+    <string name="added_to_favourites">リポジトリをお気に入りに追加しました</string>
+    <string name="removed_from_favourites">リポジトリをお気に入りから削除しました</string>
+    <string name="add_to_favourites">お気に入りに追加</string>
+    <string name="remove_from_favourites">お気に入りから削除</string>
+    <string name="favourites">お気に入り</string>
+
+    <string name="added_just_now">たった今追加されました</string>
+    <string name="added_hours_ago">%1$d時間前に追加</string>
+    <string name="added_yesterday">昨日追加</string>
+    <string name="added_days_ago">%1$d日前に追加</string>
+    <string name="added_on_date">%1$s に追加</string>
+
 </resources>

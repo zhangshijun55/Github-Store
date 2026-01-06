@@ -8,9 +8,6 @@ import githubstore.composeapp.generated.resources.home_failed_to_load_repositori
 import githubstore.composeapp.generated.resources.no_repositories_found
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -21,8 +18,10 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import zed.rainxch.githubstore.core.domain.Platform
 import zed.rainxch.githubstore.core.domain.model.PlatformType
+import zed.rainxch.githubstore.core.domain.repository.FavouritesRepository
 import zed.rainxch.githubstore.core.domain.repository.InstalledAppsRepository
 import zed.rainxch.githubstore.core.domain.use_cases.SyncInstalledAppsUseCase
+import zed.rainxch.githubstore.core.presentation.model.DiscoveryRepository
 import zed.rainxch.githubstore.feature.home.domain.repository.HomeRepository
 import zed.rainxch.githubstore.feature.home.presentation.model.HomeCategory
 
@@ -30,7 +29,8 @@ class HomeViewModel(
     private val homeRepository: HomeRepository,
     private val installedAppsRepository: InstalledAppsRepository,
     private val platform: Platform,
-    private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase
+    private val syncInstalledAppsUseCase: SyncInstalledAppsUseCase,
+    private val favouritesRepository: FavouritesRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -46,6 +46,7 @@ class HomeViewModel(
                 loadPlatform()
                 loadRepos(isInitial = true)
                 observeInstalledApps()
+                observeFavourites()
 
                 hasLoadedInitialData = true
             }
@@ -56,9 +57,6 @@ class HomeViewModel(
             initialValue = HomeState()
         )
 
-    /**
-     * Sync system state to ensure DB is up-to-date before loading.
-     */
     private fun syncSystemState() {
         viewModelScope.launch {
             try {
@@ -85,7 +83,7 @@ class HomeViewModel(
                 _state.update { current ->
                     current.copy(
                         repos = current.repos.map { homeRepo ->
-                            val app = installedMap[homeRepo.repo.id]
+                            val app = installedMap[homeRepo.repository.id]
                             homeRepo.copy(
                                 isInstalled = app != null,
                                 isUpdateAvailable = app?.isUpdateAvailable ?: false
@@ -143,18 +141,26 @@ class HomeViewModel(
                         .first()
                         .associateBy { it.repoId }
 
+                    val favoritesMap = favouritesRepository
+                        .getAllFavorites()
+                        .first()
+                        .associateBy { it.repoId }
+
                     val newReposWithStatus = paginatedRepos.repos.map { repo ->
                         val app = installedAppsMap[repo.id]
-                        HomeRepo(
+                        val favourite = favoritesMap[repo.id]
+
+                        DiscoveryRepository(
                             isInstalled = app != null,
+                            isFavourite = favourite != null,
                             isUpdateAvailable = app?.isUpdateAvailable ?: false,
-                            repo = repo
+                            repository = repo
                         )
                     }
 
                     _state.update { currentState ->
                         val rawList = currentState.repos + newReposWithStatus
-                        val uniqueList = rawList.distinctBy { it.repo.fullName }
+                        val uniqueList = rawList.distinctBy { it.repository.fullName }
 
                         currentState.copy(
                             repos = uniqueList,
@@ -233,6 +239,23 @@ class HomeViewModel(
 
             HomeAction.OnAppsClick -> {
                 /* Handled in composable */
+            }
+        }
+    }
+
+    private fun observeFavourites() {
+        viewModelScope.launch {
+            favouritesRepository.getAllFavorites().collect { favourites ->
+                val favouritesMap = favourites.associateBy { it.repoId }
+                _state.update { current ->
+                    current.copy(
+                        repos = current.repos.map { homeRepo ->
+                            homeRepo.copy(
+                                isFavourite = favouritesMap.containsKey(homeRepo.repository.id)
+                            )
+                        }
+                    )
+                }
             }
         }
     }

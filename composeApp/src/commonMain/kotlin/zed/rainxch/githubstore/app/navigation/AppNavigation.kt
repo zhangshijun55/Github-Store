@@ -27,6 +27,7 @@ import org.koin.core.parameter.parametersOf
 import zed.rainxch.githubstore.feature.apps.presentation.AppsRoot
 import zed.rainxch.githubstore.feature.auth.presentation.AuthenticationRoot
 import zed.rainxch.githubstore.feature.details.presentation.DetailsRoot
+import zed.rainxch.githubstore.feature.favourites.FavouritesRoot
 import zed.rainxch.githubstore.feature.home.presentation.HomeRoot
 import zed.rainxch.githubstore.feature.search.presentation.SearchRoot
 import zed.rainxch.githubstore.feature.settings.presentation.SettingsRoot
@@ -63,7 +64,7 @@ fun AppNavigation(
                             onNavigateToDetails = { repo ->
                                 navBackStack.add(
                                     GithubStoreGraph.DetailsScreen(
-                                        repositoryId = repo.id.toInt()
+                                        repositoryId = repo.id
                                     )
                                 )
                             }
@@ -78,7 +79,7 @@ fun AppNavigation(
                             onNavigateToDetails = { repo ->
                                 navBackStack.add(
                                     GithubStoreGraph.DetailsScreen(
-                                        repositoryId = repo.id.toInt()
+                                        repositoryId = repo.id
                                     )
                                 )
                             }
@@ -112,6 +113,17 @@ fun AppNavigation(
                         )
                     }
 
+                    entry<GithubStoreGraph.FavouritesScreen> {
+                        FavouritesRoot(
+                            onNavigateBack = {
+                                navBackStack.removeLastOrNull()
+                            },
+                            onNavigateToDetails = {
+                                navBackStack.add(GithubStoreGraph.DetailsScreen(it))
+                            },
+                        )
+                    }
+
                     entry<GithubStoreGraph.SettingsScreen> {
                         SettingsRoot(
                             onNavigateBack = {
@@ -128,7 +140,7 @@ fun AppNavigation(
                             onNavigateToRepo = { repoId ->
                                 navBackStack.add(
                                     GithubStoreGraph.DetailsScreen(
-                                        repositoryId = repoId.toInt()
+                                        repositoryId = repoId
                                     )
                                 )
                             }

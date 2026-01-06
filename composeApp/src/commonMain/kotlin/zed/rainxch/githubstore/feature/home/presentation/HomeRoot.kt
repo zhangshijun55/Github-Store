@@ -192,15 +192,13 @@ private fun MainState(
         ) {
             items(
                 items = state.repos,
-                key = { it.repo.id },
+                key = { it.repository.id },
                 contentType = { "repo" }
             ) { homeRepo ->
                 RepositoryCard(
-                    isInstalled = homeRepo.isInstalled,
-                    isUpdateAvailable = homeRepo.isUpdateAvailable,
-                    repository = homeRepo.repo,
+                    discoveryRepository = homeRepo,
                     onClick = {
-                        onAction(HomeAction.OnRepositoryClick(homeRepo.repo))
+                        onAction(HomeAction.OnRepositoryClick(homeRepo.repository))
                     },
                     modifier = Modifier
                         .animateItem()
