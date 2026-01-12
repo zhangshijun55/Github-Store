@@ -272,7 +272,6 @@
     <string name="minutes_ago">%d분 전</string>
     <string name="hours_ago">%d시간 전</string>
     <string name="days_ago">%d일 전</string>
-    <string name="sync_failed">별표 저장소 동기화에 실패했습니다</string>
     <string name="dismiss">닫기</string>
     <string name="sync_starred_failed">별표 저장소 동기화에 실패했습니다</string>
 

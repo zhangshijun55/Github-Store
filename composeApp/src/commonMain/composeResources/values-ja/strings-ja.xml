@@ -221,7 +221,6 @@
     <string name="minutes_ago">%d分前</string>
     <string name="hours_ago">%d時間前</string>
     <string name="days_ago">%d日前</string>
-    <string name="sync_failed">スター付きリポジトリの同期に失敗しました</string>
     <string name="dismiss">閉じる</string>
     <string name="sync_starred_failed">スター付きリポジトリの同期に失敗しました</string>
 

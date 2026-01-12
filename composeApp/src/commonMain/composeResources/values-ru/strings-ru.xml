@@ -239,7 +239,6 @@
     <string name="minutes_ago">%d мин назад</string>
     <string name="hours_ago">%d ч назад</string>
     <string name="days_ago">%d д назад</string>
-    <string name="sync_failed">Не удалось синхронизировать избранные репозитории</string>
     <string name="dismiss">Закрыть</string>
     <string name="sync_starred_failed">Не удалось синхронизировать избранные репозитории</string>
 

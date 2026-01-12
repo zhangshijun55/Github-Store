@@ -238,8 +238,7 @@
     <string name="minutes_ago">%d min temu</string>
     <string name="hours_ago">%d h temu</string>
     <string name="days_ago">%d d temu</string>
-    <string name="sync_failed">Nie udało się zsynchronizować oznaczonych repozytoriów</string>
     <string name="dismiss">Zamknij</string>
-    <string name="sync_starred_failed">Nie udało się zsynchronizować polecanych repozytoriów</string>
+    <string name="sync_starred_failed">Nie udało się zsynchronizować oznaczonych gwiazdką repozytoriów</string>
 
 </resources>

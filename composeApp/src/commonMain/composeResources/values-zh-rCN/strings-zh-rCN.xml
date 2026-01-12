@@ -222,7 +222,6 @@
     <string name="minutes_ago">%d 分钟前</string>
     <string name="hours_ago">%d 小时前</string>
     <string name="days_ago">%d 天前</string>
-    <string name="sync_failed">同步收藏仓库失败</string>
     <string name="dismiss">关闭</string>
     <string name="sync_starred_failed">同步收藏的仓库失败</string>
 
