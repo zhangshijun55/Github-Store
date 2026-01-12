@@ -358,11 +358,11 @@ class SearchRepositoryImpl(
             val name = nameRaw.lowercase()
             return when (platform) {
                 SearchPlatformType.All -> name.endsWith(".apk") ||
-                        name.endsWith(".msi") || name.endsWith(".exe") || name.contains(".exe") ||
+                        name.endsWith(".msi") || name.endsWith(".exe") ||
                         name.endsWith(".dmg") || name.endsWith(".pkg") ||
                         name.endsWith(".appimage") || name.endsWith(".deb") || name.endsWith(".rpm")
                 SearchPlatformType.Android -> name.endsWith(".apk")
-                SearchPlatformType.Windows -> name.endsWith(".exe") || name.endsWith(".msi") || name.contains(".exe")
+                SearchPlatformType.Windows -> name.endsWith(".exe") || name.endsWith(".msi")
                 SearchPlatformType.Macos -> name.endsWith(".dmg") || name.endsWith(".pkg")
                 SearchPlatformType.Linux -> name.endsWith(".appimage") || name.endsWith(".deb") || name.endsWith(
                     ".rpm"
