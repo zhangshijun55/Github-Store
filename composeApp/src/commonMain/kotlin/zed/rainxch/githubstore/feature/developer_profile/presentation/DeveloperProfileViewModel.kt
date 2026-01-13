@@ -44,12 +44,24 @@ class DeveloperProfileViewModel(
 
     private fun loadDeveloperData() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    isLoadingRepos = false,
+                    errorMessage = null
+                )
+            }
 
             val profileResult = repository.getDeveloperProfile(username)
             profileResult
                 .onSuccess { profile ->
-                    _state.update { it.copy(profile = profile) }
+                    _state.update {
+                        it.copy(
+                            profile = profile,
+                            isLoading = false,
+                            isLoadingRepos = true
+                        )
+                    }
                 }
                 .onFailure { error ->
                     _state.update {
@@ -61,7 +73,6 @@ class DeveloperProfileViewModel(
                     return@launch
                 }
 
-            _state.update { it.copy(isLoadingRepos = true) }
             val reposResult = repository.getDeveloperRepositories(username)
 
             reposResult
@@ -102,14 +113,20 @@ class DeveloperProfileViewModel(
 
             filtered = when (currentState.currentFilter) {
                 RepoFilterType.ALL -> filtered
-                RepoFilterType.WITH_RELEASES -> filtered.filter { it.hasInstallableAssets }.toImmutableList()
+                RepoFilterType.WITH_RELEASES -> filtered.filter { it.hasInstallableAssets }
+                    .toImmutableList()
+
                 RepoFilterType.INSTALLED -> filtered.filter { it.isInstalled }.toImmutableList()
                 RepoFilterType.FAVORITES -> filtered.filter { it.isFavorite }.toImmutableList()
             }
 
             filtered = when (currentState.currentSort) {
-                RepoSortType.UPDATED -> filtered.sortedByDescending { it.updatedAt }.toImmutableList()
-                RepoSortType.STARS -> filtered.sortedByDescending { it.stargazersCount }.toImmutableList()
+                RepoSortType.UPDATED -> filtered.sortedByDescending { it.updatedAt }
+                    .toImmutableList()
+
+                RepoSortType.STARS -> filtered.sortedByDescending { it.stargazersCount }
+                    .toImmutableList()
+
                 RepoSortType.NAME -> filtered.sortedBy { it.name.lowercase() }.toImmutableList()
             }
 

@@ -6,6 +6,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -47,6 +48,8 @@ class DeveloperProfileRepositoryImpl(
 
                 val userResponse: GitHubUserResponse = response.body()
                 Result.success(userResponse.toDomain())
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.e(e) { "Failed to fetch developer profile for $username" }
                 Result.failure(e)
@@ -102,6 +105,8 @@ class DeveloperProfileRepositoryImpl(
                 }
 
                 Result.success(processedRepos)
+            }  catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.e(e) { "Failed to fetch repositories for $username" }
                 Result.failure(e)
@@ -159,7 +164,9 @@ class DeveloperProfileRepositoryImpl(
                     PlatformType.ANDROID -> name.endsWith(".apk")
                     PlatformType.WINDOWS -> name.endsWith(".msi") || name.endsWith(".exe")
                     PlatformType.MACOS -> name.endsWith(".dmg") || name.endsWith(".pkg")
-                    PlatformType.LINUX -> name.endsWith(".appimage") || name.endsWith(".deb") || name.endsWith(".rpm")
+                    PlatformType.LINUX -> name.endsWith(".appimage") || name.endsWith(".deb") || name.endsWith(
+                        ".rpm"
+                    )
                 }
             }
 
@@ -168,6 +175,8 @@ class DeveloperProfileRepositoryImpl(
                 hasInstallableAssets,
                 if (hasInstallableAssets) stableRelease.tagName else null
             )
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Logger.w(e) { "Failed to check releases for $owner/$repoName" }
             Triple(false, false, null)

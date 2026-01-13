@@ -278,5 +278,6 @@
     <string name="sync_starred_failed">Failed to sync starred repos</string>
 
     <string name="developer_profile_title">Developer Profile</string>
+    <string name="open_developer_profile">Open developer profile</string>
 
 </resources>
