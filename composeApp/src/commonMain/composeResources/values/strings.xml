@@ -313,15 +313,11 @@
     <string name="updated_x_ago">Updated %1$s</string>
     <string name="has_release">Has Release</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">Remove from favorites</string>
-    <string name="add_to_favorites">Add to favorites</string>
-
-    <string name="time_years_ago">%1$dy ago</string>
-    <string name="time_months_ago">%1$dmo ago</string>
-    <string name="time_days_ago">%1$dd ago</string>
-    <string name="time_hours_ago">%1$dh ago</string>
-    <string name="time_minutes_ago">%1$dm ago</string>
+    <string name="time_years_ago">%1$d y ago</string>
+    <string name="time_months_ago">%1$d mo ago</string>
+    <string name="time_days_ago">%1$d d ago</string>
+    <string name="time_hours_ago">%1$d h ago</string>
+    <string name="time_minutes_ago">%1$d m ago</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

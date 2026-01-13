@@ -275,17 +275,12 @@
     <string name="updated_x_ago">Zaktualizowano %1$s temu</string>
     <string name="has_release">Ma wydanie</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">Usuń z ulubionych</string>
-    <string name="add_to_favorites">Dodaj do ulubionych</string>
-
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$dl temu</string>
-    <string name="time_months_ago">%1$dmies temu</string>
-    <string name="time_days_ago">%1$ddn temu</string>
-    <string name="time_hours_ago">%1$dh temu</string>
-    <string name="time_minutes_ago">%1$dmin temu</string>
+    <string name="time_years_ago">%1$d l temu</string>
+    <string name="time_months_ago">%1$d mies temu</string>
+    <string name="time_days_ago">%1$d dn temu</string>
+    <string name="time_hours_ago">%1$d h temu</string>
+    <string name="time_minutes_ago">%1$d min temu</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

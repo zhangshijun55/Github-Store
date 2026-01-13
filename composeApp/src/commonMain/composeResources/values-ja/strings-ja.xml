@@ -258,16 +258,12 @@
     <string name="updated_x_ago">%1$s前に更新</string>
     <string name="has_release">リリースあり</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">お気に入りから削除</string>
-    <string name="add_to_favorites">お気に入りに追加</string>
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$d年前</string>
-    <string name="time_months_ago">%1$dヶ月前</string>
-    <string name="time_days_ago">%1$d日前</string>
-    <string name="time_hours_ago">%1$d時間前</string>
-    <string name="time_minutes_ago">%1$d分前</string>
+    <string name="time_years_ago">%1$d 年前</string>
+    <string name="time_months_ago">%1$d ヶ月前</string>
+    <string name="time_days_ago">%1$d 日前</string>
+    <string name="time_hours_ago">%1$d 時間前</string>
+    <string name="time_minutes_ago">%1$d 分前</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

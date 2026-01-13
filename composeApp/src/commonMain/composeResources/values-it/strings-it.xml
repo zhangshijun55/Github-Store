@@ -307,16 +307,12 @@
     <string name="updated_x_ago">Aggiornato %1$s fa</string>
     <string name="has_release">Ha una release</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">Rimuovi dai preferiti</string>
-    <string name="add_to_favorites">Aggiungi ai preferiti</string>
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$da fa</string>
-    <string name="time_months_ago">%1$dmesi fa</string>
-    <string name="time_days_ago">%1$dg fa</string>
-    <string name="time_hours_ago">%1$dh fa</string>
-    <string name="time_minutes_ago">%1$dmin fa</string>
+    <string name="time_years_ago">%1$d a fa</string>
+    <string name="time_months_ago">%1$d mesi fa</string>
+    <string name="time_days_ago">%1$d g fa</string>
+    <string name="time_hours_ago">%1$d h fa</string>
+    <string name="time_minutes_ago">%1$d min fa</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

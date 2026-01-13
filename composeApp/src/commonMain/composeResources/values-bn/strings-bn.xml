@@ -311,10 +311,6 @@
     <string name="updated_x_ago">%1$s আপডেট করা হয়েছে</string>
     <string name="has_release">রিলিজ আছে</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">পছন্দের তালিকা থেকে সরান</string>
-    <string name="add_to_favorites">পছন্দের তালিকায় যোগ করুন</string>
-
     <!-- Developer Profile - Relative Time -->
     <string name="time_years_ago">%1$d বছর আগে</string>
     <string name="time_months_ago">%1$d মাস আগে</string>

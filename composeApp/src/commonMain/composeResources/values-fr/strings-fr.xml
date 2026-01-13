@@ -258,16 +258,12 @@
     <string name="updated_x_ago">Mis à jour il y a %1$s</string>
     <string name="has_release">A une version</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">Retirer des favoris</string>
-    <string name="add_to_favorites">Ajouter aux favoris</string>
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">il y a %1$da</string>
-    <string name="time_months_ago">il y a %1$dmois</string>
-    <string name="time_days_ago">il y a %1$dj</string>
-    <string name="time_hours_ago">il y a %1$dh</string>
-    <string name="time_minutes_ago">il y a %1$dmin</string>
+    <string name="time_years_ago">il y a %1$d a</string>
+    <string name="time_months_ago">il y a %1$d mois</string>
+    <string name="time_days_ago">il y a %1$d j</string>
+    <string name="time_hours_ago">il y a %1$d h</string>
+    <string name="time_minutes_ago">il y a %1$d min</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

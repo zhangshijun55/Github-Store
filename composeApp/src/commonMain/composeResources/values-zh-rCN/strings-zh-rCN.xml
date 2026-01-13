@@ -259,16 +259,12 @@
     <string name="updated_x_ago">%1$s前更新</string>
     <string name="has_release">有发布版</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">从收藏中移除</string>
-    <string name="add_to_favorites">添加到收藏</string>
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$d年前</string>
-    <string name="time_months_ago">%1$d个月前</string>
-    <string name="time_days_ago">%1$d天前</string>
-    <string name="time_hours_ago">%1$d小时前</string>
-    <string name="time_minutes_ago">%1$d分钟前</string>
+    <string name="time_years_ago">%1$d 年前</string>
+    <string name="time_months_ago">%1$d 个月前</string>
+    <string name="time_days_ago">%1$d 天前</string>
+    <string name="time_hours_ago">%1$d 小时前</string>
+    <string name="time_minutes_ago">%1$d 分钟前</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

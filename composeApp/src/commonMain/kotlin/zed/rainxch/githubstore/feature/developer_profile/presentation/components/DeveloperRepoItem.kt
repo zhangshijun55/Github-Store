@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import githubstore.composeapp.generated.resources.Res
+import githubstore.composeapp.generated.resources.add_to_favourites
 import githubstore.composeapp.generated.resources.added_to_favourites
 import githubstore.composeapp.generated.resources.count_millions
 import githubstore.composeapp.generated.resources.count_thousands
@@ -45,6 +46,7 @@ import githubstore.composeapp.generated.resources.has_release
 import githubstore.composeapp.generated.resources.installed
 import githubstore.composeapp.generated.resources.issues
 import githubstore.composeapp.generated.resources.just_now
+import githubstore.composeapp.generated.resources.remove_from_favourites
 import githubstore.composeapp.generated.resources.removed_from_favourites
 import githubstore.composeapp.generated.resources.stars
 import githubstore.composeapp.generated.resources.time_days_ago
@@ -116,9 +118,9 @@ fun DeveloperRepoItem(
                             Icons.Outlined.FavoriteBorder
                         },
                         contentDescription = if (repository.isFavorite) {
-                            stringResource(Res.string.removed_from_favourites)
+                            stringResource(Res.string.remove_from_favourites)
                         } else {
-                            stringResource(Res.string.added_to_favourites)
+                            stringResource(Res.string.add_to_favourites)
                         },
                         modifier = Modifier.size(20.dp)
                     )
@@ -271,7 +273,11 @@ private fun formatCount(count: Int): String {
 
 @Composable
 private fun formatRelativeDate(dateString: String): String {
-    val instant = Instant.parse(dateString)
+    val instant = try {
+        Instant.parse(dateString)
+    } catch (_: IllegalArgumentException) {
+        return dateString
+    }
     val now = Clock.System.now()
     val duration = now - instant
 

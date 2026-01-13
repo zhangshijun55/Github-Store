@@ -273,19 +273,15 @@
     <string name="no_favorite_repos">Нет избранных репозиториев</string>
 
     <!-- Developer Profile - Repository Item -->
-    <string name="updated_x_ago">Обновлено %1$s назад</string>
+    <string name="updated_x_ago">Обновлено %1$s</string>
     <string name="has_release">Есть релиз</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">Удалить из избранного</string>
-    <string name="add_to_favorites">Добавить в избранное</string>
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$dг назад</string>
-    <string name="time_months_ago">%1$dмес назад</string>
-    <string name="time_days_ago">%1$dд назад</string>
-    <string name="time_hours_ago">%1$dч назад</string>
-    <string name="time_minutes_ago">%1$dмин назад</string>
+    <string name="time_years_ago">%1$d г</string>
+    <string name="time_months_ago">%1$d мес</string>
+    <string name="time_days_ago">%1$d д</string>
+    <string name="time_hours_ago">%1$d ч</string>
+    <string name="time_minutes_ago">%1$d мин</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>

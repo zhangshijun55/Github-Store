@@ -309,17 +309,12 @@
     <string name="updated_x_ago">%1$s 전 업데이트됨</string>
     <string name="has_release">릴리스 있음</string>
 
-    <!-- Developer Profile - Actions -->
-    <string name="remove_from_favorites">즐겨찾기에서 제거</string>
-    <string name="add_to_favorites">즐겨찾기에 추가</string>
-
-
     <!-- Developer Profile - Relative Time -->
-    <string name="time_years_ago">%1$d년 전</string>
-    <string name="time_months_ago">%1$d개월 전</string>
-    <string name="time_days_ago">%1$d일 전</string>
-    <string name="time_hours_ago">%1$d시간 전</string>
-    <string name="time_minutes_ago">%1$d분 전</string>
+    <string name="time_years_ago">%1$d 년 전</string>
+    <string name="time_months_ago">%1$d 개월 전</string>
+    <string name="time_days_ago">%1$d 일 전</string>
+    <string name="time_hours_ago">%1$d 시간 전</string>
+    <string name="time_minutes_ago">%1$d 분 전</string>
 
     <!-- Developer Profile - Count Formatting -->
     <string name="count_millions">%1$dM</string>
